@@ -1,13 +1,16 @@
 {
   "name": "mi-ia-eats-monorepo",
   "version": "1.0.0",
-  "description": "Monorepo para Mi IA eats",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "install:backend": "cd backend && npm install",
-    "install:frontend": "cd frontend && npm install",
-    "install-all": "npm run install:backend && npm run install:frontend",
-    "build:frontend": "cd frontend && npm run build",
-    "start": "cd backend && npm start",
-    "build": "npm run install-all && npm run build:frontend"
+    "build": "npm run build --workspace=frontend",
+    "start": "npm start --workspace=backend"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
