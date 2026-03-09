@@ -3,9 +3,13 @@ const cors = require('cors');
 require('dotenv').config();
 const { GoogleGenAI } = require('@google/genai');
 
+const path = require('path');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Higher limit for base64 images
+
+// Serve static files from the React frontend/dist folder
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Initialize SDK. It automatically picks up GEMINI_API_KEY from environment or process.env.
 const ai = new GoogleGenAI({}); 
@@ -114,6 +118,12 @@ app.post('/api/chat', async (req, res) => {
     console.error("Error in chat:", error);
     res.status(500).json({ error: "Nutri-Croc se durmió un momento 🐊💤." });
   }
+});
+
+// The "catchall" handler: for any request that doesn't 
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
