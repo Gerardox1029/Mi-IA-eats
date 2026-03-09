@@ -6,10 +6,14 @@ const { GoogleGenAI } = require('@google/genai');
 const path = require('path');
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Higher limit for base64 images
+app.use(express.json({ limit: '20mb' })); // Increased limit for complex food photos
+
+// Health check for Northflank/Ping
+app.get('/health', (req, res) => res.status(200).send('OK'));
 
 // Serve static files from the React frontend/dist folder
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+const publicPath = path.resolve(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(publicPath));
 
 // Initialize SDK. It automatically picks up GEMINI_API_KEY from environment or process.env.
 const ai = new GoogleGenAI({}); 
@@ -123,10 +127,10 @@ app.post('/api/chat', async (req, res) => {
 // The "catchall" handler: for any request that doesn't 
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en puerto ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor listo en puerto ${PORT} (0.0.0.0)`);
 });
