@@ -20,10 +20,17 @@ export default function Chat({ onClose }) {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
+      // Current history with the message we just added
+      const currentHistory = [...messages, newMsg];
+      
+      const backendUrl = window.location.origin.includes('localhost') 
+        ? 'http://localhost:5000' 
+        : window.location.origin; // Assume same domain if not localhost
+
+      const response = await fetch(`${backendUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, history: messages })
+        body: JSON.stringify({ message: input, history: currentHistory })
       });
       const data = await response.json();
       
