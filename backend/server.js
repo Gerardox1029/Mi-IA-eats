@@ -16,7 +16,7 @@ const publicPath = path.resolve(__dirname, '..', 'frontend', 'dist');
 app.use(express.static(publicPath));
 
 // Initialize SDK. It automatically picks up GEMINI_API_KEY from environment or process.env.
-const ai = new GoogleGenAI({}); 
+const ai = new GoogleGenAI({});
 
 const SYSTEM_PROMPT_ANALYZE = `Eres un experto nutricionista. Analiza la imagen de comida adjunta junto con la descripción del usuario.
 TU RESPUESTA DEBE SER ESTRICTAMENTE UN JSON VÁLIDO CON LA SIGUIENTE ESTRUCTURA. NO AÑADAS TEXTO FUERA DEL JSON:
@@ -47,11 +47,11 @@ ESTADOS DE SALUD PERMITIDOS para 'label' (y su index correspondiente):
 app.post('/api/analyze', async (req, res) => {
   try {
     const { imageBase64, userPrompt } = req.body;
-    
+
     // Default image extraction
     let cleanBase64 = imageBase64;
     let mimeType = "image/jpeg";
-    
+
     if (imageBase64.includes('base64,')) {
       const parts = imageBase64.split('base64,');
       mimeType = parts[0].split(':')[1].split(';')[0];
@@ -100,7 +100,7 @@ app.post('/api/chat', async (req, res) => {
     const { message, history = [] } = req.body;
 
     // Build plain prompt history
-    let promptHistory = history.map(msg => 
+    let promptHistory = history.map(msg =>
       `${msg.sender === 'user' ? 'Usuario' : 'Nutri-Croc'}: ${msg.text}`
     ).join('\n');
 
@@ -126,7 +126,7 @@ app.post('/api/chat', async (req, res) => {
 
 // The "catchall" handler: for any request that doesn't 
 // match one above, send back React's index.html file.
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 

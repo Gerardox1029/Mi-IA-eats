@@ -1,13 +1,13 @@
 # Build stage for Frontend
-FROM node:18-alpine AS frontend-builder
+FROM node:22 AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN rm -f package-lock.json && npm install
 COPY frontend/ ./
 RUN npm run build
 
 # Final stage for Backend
-FROM node:18-alpine
+FROM node:22
 WORKDIR /app
 COPY backend/package*.json ./backend/
 # Use a clever trick to install all deps from root too
