@@ -75,10 +75,16 @@ app.post('/api/analyze', async (req, res) => {
       }
     });
 
-    let rawText = response.text();
-    // Strip possible markdown wrapping like ```json ... ```
-    if (rawText.startsWith('```')) {
-      rawText = rawText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+    let rawText = typeof response.text === 'function' ? response.text() : response.text;
+    
+    // Attempt robust parsing by extracting only what is inside the main JSON brackets
+    const startIndex = rawText.indexOf('{');
+    const endIndex = rawText.lastIndexOf('}');
+    
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+      rawText = rawText.substring(startIndex, endIndex + 1);
+    } else {
+      throw new Error("Respuesta no tiene formato JSON esperado: " + rawText);
     }
 
     const data = JSON.parse(rawText);
@@ -112,7 +118,7 @@ app.post('/api/chat', async (req, res) => {
     });
 
     // The response could be slightly malformed if it includes "Nutri-Croc:", strip it
-    let reply = response.text().trim();
+    let reply = (typeof response.text === 'function' ? response.text() : response.text).trim();
     if (reply.startsWith('Nutri-Croc:')) {
       reply = reply.replace('Nutri-Croc:', '').trim();
     }
